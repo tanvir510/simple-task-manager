@@ -1,61 +1,135 @@
-import './index.css'
+import "./index.css";
 
+window.onload = function() {
+  const taskField = document.querySelector("#taskField");
+  const addTaskBtn = document.querySelector("#addTaskBtn");
+  const allTasks = document.querySelector("#allTasks");
 
-window.onload = function () {
+  taskField.addEventListener("keypress", function(e) {
+    if (e.keyCode === 13) {
+      createNewTask(allTasks, e.target.value);
+      this.value = "";
+    }
+  });
+};
 
-    const taskField = document.querySelector('#taskField')
-    const addTaskBtn = document.querySelector('#addTaskBtn')
-    const allTasks = document.querySelector('#allTasks')
+function createNewTask(parent, task) {
+  let col = create({
+    class: "col-sm-3"
+  });
+  let singleTask = create({
+    class: "single-task d-flex"
+  });
+  let singleTaskP = create("p");
+  singleTaskP.innerHTML = task;
+  singleTaskP.style.color = "#fff";
+  singleTask.appendChild(singleTaskP);
+  let span = create("span", {
+    class: "ml-auto"
+  });
+  span.innerHTML = `<i class="fas fa-times-circle"></i>`;
+  span.addEventListener("click", function() {
+    parent.removeChild(col);
+  });
+  singleTask.appendChild(span);
 
-    taskField.addEventListener('keypress', function (e) {
-        if (e.keyCode === 13) {
-            createNewTask(parent, e.target.value)
-            this.value = ''
+  let taskControler = createTaskController(singleTask);
+  taskControler.style.visibility = "hidden";
+  taskControler.style.transition = ".2s";
+  singleTask.appendChild(taskControler);
+
+  singleTask.onmouseenter = function() {
+    taskControler.style.visibility = "visible";
+    taskControler.style.transition = ".2s";
+  };
+  singleTask.onmouseleave = function() {
+    taskControler.style.visibility = "hidden";
+    taskControler.style.transition = ".2s";
+  };
+
+  col.appendChild(singleTask);
+  parent.appendChild(col);
+}
+
+function createTaskController(parent) {
+  let controlPannel = create({
+    class: "task-control-panel d-flex align-items-center"
+  });
+  let colorPallet = createColorPallet(parent);
+  controlPannel.appendChild(colorPallet);
+  let editBtn = createEditBtn(parent);
+  controlPannel.appendChild(editBtn);
+  return controlPannel;
+}
+
+function createEditBtn(parent) {
+  let span = create("span", { class: "ml-auto mr-2" });
+  span.innerHTML = `<i class="fas fa-edit"></i>`;
+  span.style.color = "#fff";
+  span.addEventListener("click", function() {
+    let p = parent.querySelector("p");
+    let textArea = create("textarea", { class: "inner-textarea" });
+    textArea.style.width = parent.offsetWidth + "px";
+    textArea.style.height = parent.offsetHeight + "px";
+    textArea.innerHTML = p.innerHTML;
+
+    textArea.addEventListener("keypress", function(e) {
+      if (e.keyCode === 13) {
+        e.stopPropagation();
+        if (this.value) {
+          p.innerHTML = this.value;
+          parent.removeChild(this);
+        } else {
+          alert("Please put some data.");
         }
-    })
+      }
+    });
+
+    parent.appendChild(textArea);
+  });
+  return span;
 }
 
-function createNewTask(allTasks, task) {
-    console.log(task)
+function createColorPallet(parent) {
+  const colors = ["green", "red", "grey", "blue", "salmon", "yellow"];
+
+  let colorDiv = create({ class: "d-flex align-items-center" });
+  colors.forEach(color => {
+    let div = create({ class: "color-circle ml-1" });
+    div.style.background = color;
+    div.addEventListener("click", function() {
+      parent.style.background = color;
+    });
+    colorDiv.appendChild(div);
+  });
+
+  return colorDiv;
 }
 
+window.create = function() {
+  if (arguments.length === 0) {
+    return document.createElement("div");
+  }
 
+  if (arguments.length === 1 && typeof arguments[0] != "object") {
+    return document.createElement(arguments[0]);
+  }
 
+  var tag = arguments[0];
+  var attr = arguments[1] || arguments[0];
 
+  if (arguments.length === 1 && typeof arguments[0] === "object") {
+    tag = "div";
+  }
 
+  var element = document.createElement(tag);
 
+  for (var i in attr) {
+    element.setAttribute(i, attr[i]);
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  return element;
+};
 
 // window.onload = function() {
 
@@ -169,7 +243,6 @@ function createNewTask(allTasks, task) {
 
 //     return colorDiv
 // }
-
 
 // window.create = function () {
 
